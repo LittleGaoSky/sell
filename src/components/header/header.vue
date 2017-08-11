@@ -36,7 +36,10 @@
     <div class="detail" v-show="detailShow">
       <div class="detail-wrapper clearfix">
         <div class="detail-main">
-          <p>{{seller.bulletin}}</p>
+          <h1 class="name">{{seller.name}}</h1>
+          <div class="star-wrapper">
+            <star :size="48" :score="seller.score"></star>
+          </div>
         </div>
       </div>
       <div class="detail-close" @click="showDetail()">
@@ -48,6 +51,8 @@
 
 
 <script type="text/ecmascript-6">
+  // 引入star组件
+  import star from '@/components/star/star';
   export default {
     props: {seller: Object},
     data() {
@@ -62,6 +67,10 @@
       showDetail() {
         this.detailShow = !this.detailShow;
       }
+    },
+    // 注册star组件
+    components: {
+      star
     }
   };
 </script>
@@ -194,9 +203,18 @@
       background: rgba(7,17,27,0.8)
       .detail-wrapper
         min-height: 100%
+        width: 100%
         .detail-main
           margin-top: 64px
           padding-bottom: 64px
+          text-align: center
+          .name
+            line-height: 16px
+            font-size: 16px
+            font-weight: 700
+          .star-wrapper
+            margin-top: 16px
+            padding: 2px 0
       .detail-close
         position: relative
         width: 32px
