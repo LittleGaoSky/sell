@@ -18,13 +18,13 @@
           <span class="text">{{seller.supports[0].description}}</span>
         </div>
       </div>
-      <div v-if="seller.supports" class="support-count">
+      <div v-if="seller.supports" class="support-count" @click="showDetail()">
         <span class="count">{{seller.supports.length}}个</span>
         <i class="icon-keyboard_arrow_right"></i>
       </div>
     </div>
     <!--公告区-->
-    <div class="bulletin-wrapper">
+    <div class="bulletin-wrapper" @click="showDetail()">
       <span class="bulletin-title"></span><span class="bulletin-text">{{seller.bulletin}}</span>
       <i class="icon-keyboard_arrow_right"></i>
     </div>
@@ -32,6 +32,8 @@
     <div class="background">
       <img :src="seller.avatar" width="100%" height="100%">
     </div>
+    <!--浮层-->
+    <div class="detail" v-show="detailShow"></div>
   </div>
 </template>
 
@@ -39,8 +41,18 @@
 <script type="text/ecmascript-6">
   export default {
     props: {seller: Object},
+    data() {
+      return {
+        detailShow: false
+      };
+    },
     created() {
       this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
+    },
+    methods: {
+      showDetail() {
+        this.detailShow = true;
+      }
     }
   };
 </script>
@@ -49,6 +61,7 @@
   @import "../../common/stylus/mixin.styl";//css不可以用alias别名，那是针对js的，必须用相对路径
   .header
     position: relative
+    overflow: hidden
     color : #fff
     background: rgba(7,17,27,0.5)
     .content-wrapper
@@ -161,4 +174,13 @@
       z-index: -1
       filter: blur(10px)
 
+    .detail
+      position: fixed
+      z-index: 100
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      overflow: auto
+      background: rgba(7,17,27,0.8)
 </style>
