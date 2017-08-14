@@ -27,6 +27,9 @@
                 <div class="price">
                   <span class="now">￥{{food.price}}</span><span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                 </div>
+                <div class="cartcontrol-wrapper">
+                  <cartcontrol :food="food"></cartcontrol>
+                </div>
               </div>
             </li>
           </ul>
@@ -41,6 +44,7 @@
 <script type="text/ecmascript-6">
   import BScroll from 'better-scroll';
   import shopcart from '../shopcart/shopcart.vue';
+  import cartcontrol from '../cartcontrol/cartcontrol.vue';
   const ERR_OK = 0;
   export default {
     props: {seller: Object},
@@ -92,9 +96,7 @@
       _initScroll() {
         // probeType = 3表示，希望滚动时，能实时告诉我们滚动的位置,会阻止默认事件，包括点击事件，故传参click:true
         this.menuScroll = new BScroll(this.$refs.menuWrapper, {click: true});
-        this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
-          probeType: 3
-        });
+        this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {probeType: 3, click: true});
         // pos.y滚动时是个负值，取绝对值
         this.foodsScroll.on('scroll', (pos) => {
           this.scrollY = Math.abs(Math.round(pos.y));
@@ -117,7 +119,9 @@
       }
     },
     components: {
-      shopcart: shopcart
+      // shopcart: shopcart简写
+      shopcart,
+      cartcontrol
     }
   };
 </script>
@@ -226,4 +230,9 @@
               text-decoration: line-through
               font-size: 10px
               color: rgb(147,153,159)
+          .cartcontrol-wrapper
+            display: block
+            position: absolute
+            right: 0
+            bottom: 12px
 </style>
