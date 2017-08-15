@@ -36,7 +36,7 @@
         </li>
       </ul>
     </div>
-    <shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
+    <shopcart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
   </div>
 </template>
 
@@ -67,6 +67,18 @@
           }
         }
         return 0;
+      },
+      // 因为是Object类型数据，cartcontrol组件选中食物，改变的数据会传递到goods组件来，进而通过goods组件传递给shopcart组件
+      selectFoods: function () {
+        let foods = [];
+        this.goods.forEach((item) => {
+          item.foods.forEach((food) => {
+            if (food.count) {
+              foods.push(food);
+            }
+          });
+        });
+        return foods;
       }
     },
     created() {
