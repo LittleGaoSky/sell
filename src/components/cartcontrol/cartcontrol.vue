@@ -27,6 +27,8 @@
           } else {
             this.food.count++;
           }
+          // 将DOM对象作为事件参数传入
+          this.$emit('add', event.target);
         },
         decreaseCart(event) {
           if (!event._constructed) {
