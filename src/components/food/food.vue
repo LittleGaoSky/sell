@@ -16,14 +16,15 @@
           <div class="price">
             <span class="now">￥{{food.price}}</span><span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
           </div>
+          <div class="cartcontroll-wrapper">
+            <cartcontroll  @add="addFood" :food="food"></cartcontroll>
+          </div>
+          <transition name="fade">
+            <div @click.stop="addFirst($event)" class="buy" v-show="!food.count || food.count===0">加入购物车</div>
+          </transition>
         </div>
-        <div class="cartcontroll-wrapper">
-          <cartcontroll  @add="addFood" :food="food"></cartcontroll>
-        </div>
-        <transition name="fade">
-          <div @click.stop="addFirst($event)" class="buy" v-show="!food.count || food.count===0">加入购物车</div>
-        </transition>
       </div>
+      <split></split>
     </div>
   </transition>
 </template>
@@ -32,6 +33,7 @@
     import BScroll from 'better-scroll';
     import cartcontroll from '../cartcontrol/cartcontrol.vue';
     import Vue from 'vue';
+    import split from '../split/split.vue';
     export default {
       props: {food: Object},
       data() {
@@ -63,7 +65,8 @@
         }
       },
       components: {
-        cartcontroll
+        cartcontroll,
+        split
       }
     };
 </script>
@@ -103,6 +106,7 @@
           font-size: 20px
           color: #fff
     .content
+      position: relative
       padding: 18px
       .title
         line-height: 14px
@@ -131,27 +135,27 @@
           text-decoration: line-through
           font-size: 10px
           color: rgb(147,153,159)
-    .cartcontroll-wrapper
-      position: absolute
-      right: 12px     // cartcontrol组件padding: 6px，故设计稿中的right, bottom都要减去6px
-      bottom: 12px
-    .buy
-      position: absolute
-      right: 18px
-      bottom: 18px
-      z-index: 10
-      height: 24px
-      padding: 6px 12px
-      line-height: 12px
-      box-sizing: border-box  // IE盒子模型 width=padding + content + border
-      font-size: 10px
-      color: #fff
-      background: rgb(0,160,220)
-      border-radius: 12px
-      opacity: 1
-      &.fade-enter-active, &.fade-leave-active
-        transition: all 0.4s
-      &.fade-enter, &.fade-leave-active
-        opacity: 0
-        z-index: -1
+      .cartcontroll-wrapper
+        position: absolute
+        right: 12px     // cartcontrol组件padding: 6px，故设计稿中的right, bottom都要减去6px
+        bottom: 12px
+      .buy
+        position: absolute
+        right: 18px
+        bottom: 18px
+        z-index: 10
+        height: 24px
+        padding: 6px 12px
+        line-height: 12px
+        box-sizing: border-box  // IE盒子模型 width=padding + content + border
+        font-size: 10px
+        color: #fff
+        background: rgb(0,160,220)
+        border-radius: 12px
+        opacity: 1
+        &.fade-enter-active, &.fade-leave-active
+          transition: all 0.4s
+        &.fade-enter, &.fade-leave-active
+          opacity: 0
+          z-index: -1
 </style>
