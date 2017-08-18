@@ -1,30 +1,43 @@
 <template>
   <transition name="move">
     <div class="food" v-show="showFlag" ref="food">
-      <div class="food-content">
-        <div class="image-header">
-          <img :src="food.image">
-          <div class="back" @click="hide">
-            <i class="icon-arrow_lift"></i>
+      <!--style会加载ref的第一个节点上，ref里面加个div包一层
+-->
+      <div>
+        <div class="food-content">
+          <div class="image-header">
+            <img :src="food.image">
+            <div class="back" @click="hide">
+              <i class="icon-arrow_lift"></i>
+            </div>
+          </div>
+          <div class="content">
+            <h1 class="title">{{food.name}}</h1>
+            <div class="detail">
+              <span class="sell-count">月售{{food.sellCount}}份</span><span class="rating">好评率{{food.rating}}%</span>
+            </div>
+            <div class="price">
+              <span class="now">￥{{food.price}}</span><span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
+            </div>
+            <div class="cartcontroll-wrapper">
+              <cartcontroll  @add="addFood" :food="food"></cartcontroll>
+            </div>
+            <transition name="fade">
+              <div @click.stop="addFirst($event)" class="buy" v-show="!food.count || food.count===0">加入购物车</div>
+            </transition>
           </div>
         </div>
-        <div class="content">
-          <h1 class="title">{{food.name}}</h1>
-          <div class="detail">
-            <span class="sell-count">月售{{food.sellCount}}份</span><span class="rating">好评率{{food.rating}}%</span>
-          </div>
-          <div class="price">
-            <span class="now">￥{{food.price}}</span><span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
-          </div>
-          <div class="cartcontroll-wrapper">
-            <cartcontroll  @add="addFood" :food="food"></cartcontroll>
-          </div>
-          <transition name="fade">
-            <div @click.stop="addFirst($event)" class="buy" v-show="!food.count || food.count===0">加入购物车</div>
-          </transition>
+        <split></split>
+        <div class="info" v-show="food.info">
+          <h1 class="title">商品介绍</h1>
+          <div class="text">{{food.info}}</div>
+        </div>
+        <split></split>
+        <div class="ratings">
+          <h1 class="title">商品评价</h1>
+          <ratingselect @select="select" @toggleContent="toggleContent" :select-type="selectType" :only-content="onlyContent" :desc="desc" :ratings="food.ratings"></ratingselect>
         </div>
       </div>
-      <split></split>
     </div>
   </transition>
 </template>
@@ -34,10 +47,23 @@
     import cartcontroll from '../cartcontrol/cartcontrol.vue';
     import Vue from 'vue';
     import split from '../split/split.vue';
+    import ratingselect from '../ratingselect/ratingselect.vue';
+    //  const POSITIVE = 0;
+    //  const NEGATIVE = 1;
+    const ALL = 2;
     export default {
       props: {food: Object},
       data() {
-        return {showFlag: false};
+        return {
+          showFlag: false,
+          selectType: ALL,
+          onlyContent: false,
+          desc: {
+            all: '全部',
+            positive: '推荐',
+            negative: '吐槽'
+          }
+        };
       },
       methods: {
         show() {
@@ -60,13 +86,20 @@
           this.$emit('add', event.target);
           Vue.set(this.food, 'count', 1);// 第一次可能没有count属性
         },
-        addFood (target) {
+        addFood(target) {
           this.$emit('add', target);
+        },
+        select(type) {
+          this.selectType = type;
+        },
+        toggleContent() {
+          this.onlyContent = !this.onlyContent;
         }
       },
       components: {
         cartcontroll,
-        split
+        split,
+        ratingselect
       }
     };
 </script>
@@ -158,4 +191,23 @@
         &.fade-enter, &.fade-leave-active
           opacity: 0
           z-index: -1
+    .info
+      padding: 18px
+      .title
+        line-height: 14px
+        margin-bottom: 6px
+        font-size: 14px
+        color: rgb(7,17,27)
+      .text
+        line-height: 24px
+        padding: 0 8px
+        font-size: 12px
+        color: rgb(77,85,93)
+    .ratings
+      padding-top: 18px
+      .title
+        line-height: 14px
+        margin-left: 18px
+        font-size: 14px
+        color: rgb(7,17,27)
 </style>
