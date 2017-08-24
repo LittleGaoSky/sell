@@ -27,7 +27,7 @@
             </transition>
           </div>
         </div>
-        <split></split>
+        <split v-show="food.info"></split>
         <div class="info" v-show="food.info">
           <h1 class="title">商品介绍</h1>
           <div class="text">{{food.info}}</div>
