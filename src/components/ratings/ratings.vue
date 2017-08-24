@@ -1,5 +1,5 @@
 <template>
-  <div class="ratings">
+  <div class="ratings" ref="ratings">
     <div class="ratings-content">
       <div class="overview">
         <div class="overview-left">
@@ -24,25 +24,108 @@
           </div>
         </div>
       </div>
+      <split></split>
+      <ratingselect @select="select" @toggleContent="toggleContent" :select-type="selectType" :only-content="onlyContent"  :ratings="ratings"></ratingselect>
+      <div class="rating-wrapper">
+        <ul>
+          <li v-show="needShow(rating.rateType,rating.text)" v-for="rating in ratings" class="rating-item border-1px">
+            <div class="avatar">
+              <img width="28px" height="28px" :src="rating.avatar">
+            </div>
+            <div class="content">
+              <h1 class="name">{{rating.username}}</h1>
+              <div class="star-wrapper">
+                <star :size="24" :score="rating.score"></star>
+                <span class="delivery" v-show="rating.deliveryTime"></span>
+              </div>
+              <p class="text">{{rating.text}}</p>
+              <div class="recommend" v-show="rating.recommend && rating.recommend.length">
+                <span class="icon-thumb_up"></span>
+                <span class="item" v-for="item in rating.recommend">{{item}}</span>
+              </div>
+              <div class="time">
+                {{rating.rateTime | formatDate}}
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
 
 
 <script type="text/ecmascript-6">
+  import BScroll from 'better-scroll';
   import star from '../star/star.vue';
+  import split from '../split/split.vue';
+  import ratingselect from '../ratingselect/ratingselect.vue';
+  import {formatDate} from '../../common/js/date';   // export用花括号，花括号内可以引多个
+  const ALL = 2;
+  const ERR_OK = 0;
   export default {
     props: {
       seller: Object
     },
+    data() {
+      return {
+        ratings: [],
+        showFlag: false,
+        selectType: ALL,
+        onlyContent: true
+      };
+    },
+    created() {
+      this.$http.get('/api/ratings').then((response) => {
+        response = response.body;
+        if (response.errno === ERR_OK) {
+          this.ratings = response.data;
+          this.$nextTick(() => {
+            this.scroll = new BScroll(this.$refs.ratings, {click: true});
+          });
+        }
+      });
+    },
     components: {
-      star
+      star,
+      split,
+      ratingselect
+    },
+    filters: {
+      formatDate(time) {
+        let date = new Date(time);
+        return formatDate(date, 'yyyy-MM-dd hh:mm');
+      }
+    },
+    methods: {
+      select(type) {
+        this.selectType = type;
+        this.$nextTick(() => {
+          this.scroll.refresh();
+        });
+      },
+      toggleContent() {
+        this.onlyContent = !this.onlyContent;
+        this.$nextTick(() => {
+          this.scroll.refresh();
+        });
+      },
+      needShow(type, text) {
+        if (this.onlyContent && !text) {
+          return false;
+        }
+        if (this.selectType === ALL) {
+          return true;
+        } else {
+          return type === this.selectType;
+        }
+      }
     }
-
   };
 </script>
 
 <style lang="stylus" type="text/stylus" rel="stylesheet/stylus">
+  @import "../../common/stylus/mixin.styl";
   .ratings
     position: absolute
     top: 174px
@@ -111,5 +194,64 @@
             line-height: 18px
             margin-left: 12px
             font-size: 12px
+            color: rgb(147,153,159)
+    .rating-wrapper
+      padding: 0 18px
+      .rating-item
+        display: flex
+        padding: 18px 0
+        border-1px(rgba(7,17,27,0.1))
+        .avatar
+          flex: 0 0 28px
+          width: 28px
+          margin-right: 12px
+          img
+            border-radius: 50%
+        .content
+          position: relative
+          flex: 1
+          .name
+            margin-bottom: 4px
+            line-height: 12px
+            font-size: 10px
+            color: rgb(7,17,27)
+          .star-wrapper
+            margin-bottom: 6px
+            font-size: 0px
+            .star
+              display: inline-block
+              margin-right: 6px
+              vertical-align: top
+            .delivery
+              display: inline-block
+              vertical-align: top
+              line-height: 12px
+              font-size: 10px
+              color: rgb(147,153,159)
+
+          .text
+            margin-bottom: 8px
+            line-height: 18px
+            font-size: 12px
+            color: rgb(7,17,27)
+          .recommend
+            line-height: 16px
+            font-size: 0
+            .icon-thumb_up, .item
+              display: inline-block
+              margin: 0 8px 4px 0
+              font-size: 9px
+            .icon-thumb_up
+              color: rgb(0,160,220)
+            .item
+              padding: 0 6px
+              border-radius: 1px
+              color: rgb(147,153,159)
+          .time
+            position: absolute
+            top: 0
+            right: 0
+            line-height: 12px
+            font-size: 10px
             color: rgb(147,153,159)
 </style>
