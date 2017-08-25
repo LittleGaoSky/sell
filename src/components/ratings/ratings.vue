@@ -245,8 +245,10 @@
               color: rgb(0,160,220)
             .item
               padding: 0 6px
+              border: 1px solid rgba(7,17,27,0.1)
               border-radius: 1px
               color: rgb(147,153,159)
+              background: rgb(255,255,255)
           .time
             position: absolute
             top: 0
