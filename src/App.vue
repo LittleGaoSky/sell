@@ -11,19 +11,26 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import header from '@/components/header/header.vue';
+  import {urlParse} from './common/js/util';
+  import header from './components/header/header.vue';
   const ERR_OK = 0;
   export default {
     data() {
       return {
-        seller: {}
+        seller: {
+          id: (() => { // 立即执行函数
+            let queryParam = urlParse();
+            return queryParam.id;
+          })()
+        }
       };
     },
     created() {
-      this.$http.get('/api/seller').then((response) => {
+      this.$http.get('/api/seller?id=' + this.seller.id).then((response) => {
         response = response.body;
         if (response.errno === ERR_OK) {
-          this.seller = response.data;
+          // {}接收最终返回的结果，this.seller被扩展的属性，response.data扩展的内容
+          this.seller = Object.assign({}, this.seller, response.data);
         }
       });
     },
