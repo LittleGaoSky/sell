@@ -75,7 +75,7 @@
   import split from '../../components/split/split.vue';
   import {saveToLocal, loadFromLocal} from '../../common/js/store';
   export default {
-    props: {
+    props: {// 异步更新seller，需要watch
       seller: Object
     },
     data() {
@@ -85,6 +85,14 @@
         })()
       };
     },
+    watch: {
+      seller() {
+        this.$nextTick(() => {
+          this._initScroll();
+          this._initPics();
+        });
+      }
+    },
     methods: {
       toggleFavorite(event) {
         if (!event._constructed) {
@@ -92,6 +100,31 @@
         }
         this.favorite = !this.favorite;
         saveToLocal(this.seller.id, 'favorite', this.favorite);
+      },
+      _initScroll() {
+        if (!this.scroll) {
+          this.scroll = new BScroll(this.$refs.seller, {click: true});
+        } else {
+          this.scroll.refresh();
+        }
+      },
+      _initPics() {
+        if (this.seller.pics) {
+          let picWidth = 120;
+          let margin = 6;
+          let width = (picWidth + margin) * this.seller.pics.length - margin;
+          this.$refs.picList.style.width = width + 'px';
+          this.$nextTick(() => {
+            if (!this.picScroll) {
+              this.picScroll = new BScroll(this.$refs.picWrapper, {
+                scrollX: true, // 横向滚动
+                eventPassthrough: 'vertical' // 忽略纵向滚动
+              });
+            } else {
+              this.picScroll.refresh();
+            }
+          });
+        }
       }
     },
     computed: {
@@ -103,17 +136,8 @@
       this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
     },
     mounted() {
-      this.scroll = new BScroll(this.$refs.seller, {click: true});
-      if (this.seller.pics) {
-        let picWidth = 120;
-        let margin = 6;
-        let width = (picWidth + margin) * this.seller.pics.length - margin;
-        this.$refs.picList.style.width = width + 'px';
-        this.picScroll = new BScroll(this.$refs.picWrapper, {
-          scrollX: true, // 横向滚动
-          eventPassthrough: 'vertical' // 忽略纵向滚动
-        });
-      }
+      this._initScroll();
+      this._initPics();
     },
     components: {
       star,
